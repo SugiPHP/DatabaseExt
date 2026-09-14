@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\SugiPHP\DatabaseExt;
+namespace SugiPHP\DatabaseExt\Tests;
 
 use SugiPHP\DatabaseExt\PdoExt;
 use SugiPHP\DatabaseExt\PdoStatementExt;

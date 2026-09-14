@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\SugiPHP\DatabaseExt\Event;
+namespace SugiPHP\DatabaseExt\Tests\Event;
 
 use SugiPHP\DatabaseExt\Event\ExecError;
 use SugiPHP\DatabaseExt\Event\BeforeExec;
