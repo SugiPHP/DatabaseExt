@@ -160,9 +160,11 @@ class PdoExt extends PDO implements PdoInterface
         if (self::STATE_UNAVAILABLE === $this->state) {
             return false;
         }
+        // Matched anywhere (not just as the first token) so that data-modifying CTEs,
+        // comment-prefixed statements, and stacked queries are also rejected.
         return !preg_match(
-            "/^(ALTER|CREATE|DELETE|DROP|GRANT|INSERT|RENAME|REVOKE|TRUNCATE|UPDATE)\s/i",
-            trim($queryString)
+            "/\b(ALTER|CREATE|DELETE|DROP|GRANT|INSERT|MERGE|RENAME|REPLACE|REVOKE|TRUNCATE|UPDATE)\b/i",
+            $queryString
         );
     }
 

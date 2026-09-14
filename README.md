@@ -65,7 +65,7 @@ $db = new PdoExt('sqlite:/path/to/database.sqlite');
 $db->setState(PdoExt::STATE_READ_ONLY); // or STATE_READ_WRITE / STATE_UNAVAILABLE
 ```
 
-In `STATE_READ_ONLY`, statements starting with `ALTER`, `CREATE`, `DELETE`, `DROP`, `GRANT`, `INSERT`, `RENAME`, `REVOKE`, `TRUNCATE`, or `UPDATE` are rejected (`exec()`/`query()` return `false` without dispatching any event). In `STATE_UNAVAILABLE`, all statements are rejected.
+In `STATE_READ_ONLY`, statements containing `ALTER`, `CREATE`, `DELETE`, `DROP`, `GRANT`, `INSERT`, `MERGE`, `RENAME`, `REPLACE`, `REVOKE`, `TRUNCATE`, or `UPDATE` as a whole word anywhere in the statement are rejected (`exec()`/`query()` return `false` without dispatching any event) — not just when the statement starts with one of them, so data-modifying CTEs, comment-prefixed statements, and stacked queries are also caught. This is a best-effort keyword check, not a SQL parser, so it can still be fooled and may also reject legitimate read statements that happen to contain one of these words (e.g. in a string literal). In `STATE_UNAVAILABLE`, all statements are rejected.
 
 This keyword check is an app-level guard and only covers statements issued through `PdoExt`/`PdoStatementExt`. As a second, driver-enforced layer, `setState()` also puts the underlying connection itself into (or out of) a read-only mode when the driver supports it:
 
