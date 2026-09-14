@@ -1,6 +1,6 @@
 # SugiPHP\DatabaseExt
 
-**Version 1.3**
+**Version 1.0**
 
 Extends PHP's `PDO`/`PDOStatement` with PSR-14 event dispatching and a read/write connection state guard.
 
@@ -49,6 +49,7 @@ $db->setEventDispatcher($dispatcher);
 | `QueryError` | `PdoExt::query()` | When `query()` throws a `PDOException` |
 | `BeforeExecute` / `AfterExecute` | `PdoStatementExt::execute()` | Around a successful prepared-statement `execute()` call |
 | `ExecuteError` | `PdoStatementExt::execute()` | When `execute()` throws a `PDOException` |
+| `Rejected` | `PdoExt::exec()`/`query()`, `PdoStatementExt::execute()` | Instead of any of the above, when the statement is rejected by the read/write state guard (see below) |
 
 On failure, the `*Error` event is dispatched instead of the matching `After*` event, and the original `PDOException` is then rethrown.
 
@@ -65,7 +66,7 @@ $db = new PdoExt('sqlite:/path/to/database.sqlite');
 $db->setState(PdoExt::STATE_READ_ONLY); // or STATE_READ_WRITE / STATE_UNAVAILABLE
 ```
 
-In `STATE_READ_ONLY`, statements starting with `ALTER`, `CREATE`, `DELETE`, `DROP`, `GRANT`, `INSERT`, `MERGE`, `RENAME`, `REPLACE`, `REVOKE`, `TRUNCATE`, or `UPDATE` are rejected (`exec()`/`query()` return `false` without dispatching any event). This is a best-effort, first-keyword check, not a SQL parser — it will not catch a write hidden inside a CTE, a comment-prefixed statement, or a stacked query. That is what the driver-enforced read-only mode below is for; it stops those writes at the connection level even when this check lets them through. In `STATE_UNAVAILABLE`, all statements are rejected.
+In `STATE_READ_ONLY`, statements starting with `ALTER`, `CREATE`, `DELETE`, `DROP`, `GRANT`, `INSERT`, `MERGE`, `RENAME`, `REPLACE`, `REVOKE`, `TRUNCATE`, or `UPDATE` are rejected — `exec()`/`query()`/`execute()` return `false` and a `Rejected` event is dispatched instead of the usual `Before*`/`After*` pair, so a listener can audit or monitor blocked write attempts. This is a best-effort, first-keyword check, not a SQL parser — it will not catch a write hidden inside a CTE, a comment-prefixed statement, or a stacked query. That is what the driver-enforced read-only mode below is for; it stops those writes at the connection level even when this check lets them through. In `STATE_UNAVAILABLE`, all statements are rejected the same way.
 
 This keyword check is an app-level guard and only covers statements issued through `PdoExt`/`PdoStatementExt`. As a second, driver-enforced layer, `setState()` also puts the underlying connection itself into (or out of) a read-only mode when the driver supports it:
 
@@ -75,4 +76,4 @@ This keyword check is an app-level guard and only covers statements issued throu
 | `mysql` | `SET SESSION TRANSACTION READ ONLY` | `SET SESSION TRANSACTION READ WRITE` |
 | `sqlite` | `PRAGMA query_only = ON` | `PRAGMA query_only = OFF` |
 
-Other drivers (e.g. `sqlsrv`, `oci`) have no equivalent session-level pragma, so they rely solely on the app-level keyword check above.
+Other drivers rely solely on the app-level keyword check above.

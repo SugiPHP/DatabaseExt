@@ -2,6 +2,7 @@
     "name": "sugiphp/database-ext",
     "description": "Extends PHP's PDO/PDOStatement with PSR-14 event dispatching and a read/write connection state guard.",
     "type": "library",
+    "version": "1.0",
     "license": "MIT",
     "require": {
         "php": ">=8.1",

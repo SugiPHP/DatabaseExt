@@ -13,11 +13,13 @@ use SugiPHP\DatabaseExt\Event\{
     AfterQuery,
     BeforeExec,
     BeforeExecute,
-    BeforeQuery
+    BeforeQuery,
+    Rejected
 };
 use SugiPHP\DatabaseExt\PdoStatementExt;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Tests for PDO database class
@@ -30,6 +32,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(BeforeExec::class)]
 #[CoversClass(BeforeQuery::class)]
 #[CoversClass(BeforeExecute::class)]
+#[CoversClass(Rejected::class)]
 #[CoversClass(PdoStatementExt::class)]
 class PdoReadOnlyTest extends TestCase
 {
@@ -145,5 +148,69 @@ class PdoReadOnlyTest extends TestCase
         $this->assertEquals(false, $res);
         $res = $sth->fetch(PdoExt::FETCH_ASSOC);
         $this->assertEmpty($res);
+    }
+
+    public function testExecDispatchesRejectedEventInReadOnlyMode(): void
+    {
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $db = new PdoExt('sqlite::memory:');
+        $db->setEventDispatcher($dispatcher);
+        $db->setState(PdoExt::STATE_READ_ONLY);
+
+        $events = [];
+        $dispatcher->method('dispatch')->willReturnCallback(function ($event) use (&$events) {
+            $events[] = $event;
+            return $event;
+        });
+
+        $res = $db->exec('DELETE FROM test');
+        $this->assertFalse($res);
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(Rejected::class, $events[0]);
+        $this->assertSame('DELETE FROM test', $events[0]->getQueryString());
+        $this->assertSame(PdoExt::STATE_READ_ONLY, $events[0]->getState());
+    }
+
+    public function testQueryDispatchesRejectedEventInUnavailableMode(): void
+    {
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $db = new PdoExt('sqlite::memory:');
+        $db->setEventDispatcher($dispatcher);
+        $db->setState(PdoExt::STATE_UNAVAILABLE);
+
+        $events = [];
+        $dispatcher->method('dispatch')->willReturnCallback(function ($event) use (&$events) {
+            $events[] = $event;
+            return $event;
+        });
+
+        $res = $db->query('SELECT * FROM test');
+        $this->assertFalse($res);
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(Rejected::class, $events[0]);
+        $this->assertSame(PdoExt::STATE_UNAVAILABLE, $events[0]->getState());
+    }
+
+    public function testExecuteDispatchesRejectedEventInReadOnlyMode(): void
+    {
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $db = new PdoExt('sqlite::memory:');
+        $db->exec('CREATE TABLE test (id INTEGER NOT NULL)');
+        $db->setEventDispatcher($dispatcher);
+
+        $sth = $db->prepare('DELETE FROM test WHERE id = ?');
+        $db->setState(PdoExt::STATE_READ_ONLY);
+
+        $events = [];
+        $dispatcher->method('dispatch')->willReturnCallback(function ($event) use (&$events) {
+            $events[] = $event;
+            return $event;
+        });
+
+        $res = $sth->execute([1]);
+        $this->assertFalse($res);
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(Rejected::class, $events[0]);
+        $this->assertSame([1], $events[0]->getParams());
     }
 }

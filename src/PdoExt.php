@@ -12,7 +12,8 @@ use SugiPHP\DatabaseExt\Event\{
     BeforeExec,
     BeforeQuery,
     ExecError,
-    QueryError
+    QueryError,
+    Rejected
 };
 use Psr\EventDispatcher\EventDispatcherInterface;
 use PDO;
@@ -67,6 +68,7 @@ class PdoExt extends PDO implements PdoInterface
     public function exec(string $statement): int|false
     {
         if (!$this->canExecute($statement)) {
+            $this->dispatch(new Rejected($statement, $this->state));
             return false;
         }
 
@@ -89,6 +91,7 @@ class PdoExt extends PDO implements PdoInterface
     public function query(string $query, ?int $fetchMode = null, mixed ...$fetchModeArgs): PdoStatementExt|false
     {
         if (!$this->canExecute($query)) {
+            $this->dispatch(new Rejected($query, $this->state));
             return false;
         }
 

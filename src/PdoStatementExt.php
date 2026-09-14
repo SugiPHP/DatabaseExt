@@ -7,6 +7,7 @@ namespace SugiPHP\DatabaseExt;
 use SugiPHP\DatabaseExt\Event\AfterExecute;
 use SugiPHP\DatabaseExt\Event\BeforeExecute;
 use SugiPHP\DatabaseExt\Event\ExecuteError;
+use SugiPHP\DatabaseExt\Event\Rejected;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use PDOStatement;
 use PDOException;
@@ -26,6 +27,7 @@ class PdoStatementExt extends PDOStatement implements PdoStatementInterface
     public function execute(?array $params = null): bool
     {
         if (!$this->connection->canExecute($this->queryString)) {
+            $this->dispatch(new Rejected($this->queryString, $this->connection->getState(), $params));
             return false;
         }
 
