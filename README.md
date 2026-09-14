@@ -55,6 +55,80 @@ On failure, the `*Error` event is dispatched instead of the matching `After*` ev
 
 Each `After*`/`*Error` event carries a `getBefore()` accessor returning the matching `Before*` event instance. `PdoEvent` also exposes `setAttribute(string $key, mixed $value)` / `getAttribute(string $key): mixed`, so a listener can stash arbitrary data (e.g. a profiler job) on the `Before*` event and retrieve it via `getBefore()->getAttribute(...)` when the matching `After*`/`*Error` event fires, without keeping its own state between events.
 
+### Logging and profiling example
+
+`SugiPHP\DatabaseExt` only depends on the PSR-14 `EventDispatcherInterface`, not on a full PSR-14 implementation, so the simplest way to log and time every statement is to implement that interface directly with a single class that stashes a start time on the `Before*` event and reads it back on the matching `After*`/`*Error` event:
+
+```php
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
+use SugiPHP\DatabaseExt\Event\{
+    BeforeExec, BeforeQuery, BeforeExecute,
+    AfterExec, AfterQuery, AfterExecute,
+    ExecError, QueryError, ExecuteError,
+    Rejected,
+};
+use SugiPHP\DatabaseExt\PdoExt;
+
+class QueryProfiler implements EventDispatcherInterface
+{
+    public function __construct(private LoggerInterface $logger)
+    {
+    }
+
+    public function dispatch(object $event): object
+    {
+        match (true) {
+            $event instanceof BeforeExec,
+            $event instanceof BeforeQuery,
+            $event instanceof BeforeExecute
+                => $event->setAttribute('start', microtime(true)),
+
+            $event instanceof AfterExec,
+            $event instanceof AfterQuery,
+            $event instanceof AfterExecute
+                => $this->logger->info('{ms}ms {sql}', $this->context($event)),
+
+            $event instanceof ExecError,
+            $event instanceof QueryError,
+            $event instanceof ExecuteError
+                => $this->logger->error(
+                    '{ms}ms {sql} failed: {error}',
+                    $this->context($event) + ['error' => $event->getException()->getMessage()]
+                ),
+
+            $event instanceof Rejected
+                => $this->logger->warning('rejected (state={state}) {sql}', [
+                    'state' => $event->getState(),
+                    'sql' => $event->getQueryString(),
+                ]),
+
+            default => null,
+        };
+
+        return $event;
+    }
+
+    private function context(AfterExec|AfterQuery|AfterExecute|ExecError|QueryError|ExecuteError $event): array
+    {
+        $start = $event->getBefore()->getAttribute('start');
+
+        return [
+            'sql' => $event->getQueryString(),
+            'ms' => round((microtime(true) - $start) * 1000, 1),
+        ];
+    }
+}
+
+$db = new PdoExt('sqlite:/path/to/database.sqlite', options: [
+    'dispatcher' => new QueryProfiler($logger),
+]);
+
+$db->exec("INSERT INTO users (name) VALUES ('Ivan')"); // logged with its duration
+```
+
+Swap the `LoggerInterface` calls for whatever profiler/APM hook you use (e.g. push a span per query) — the point is that `setAttribute()`/`getAttribute()` on the `Before*` event is the mechanism for carrying state (a timer, a profiler span, a request ID, ...) from before a statement runs to after it finishes or fails.
+
 ### Read/write state
 
 `PdoExt::setState()` restricts which statements may run:
