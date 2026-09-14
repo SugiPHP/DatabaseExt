@@ -9,23 +9,13 @@ use PDOException;
 /**
  * Event sent when a PDOException occurs during PdoExt::exec().
  */
-class ExecError extends PdoEvent
+class ExecError extends FollowUpEvent
 {
     public function __construct(
-        private readonly BeforeExec $before,
+        BeforeExec $before,
         private readonly PDOException $exception,
     ) {
-        parent::__construct('ExecError');
-    }
-
-    /**
-     * Get the SQL statement string.
-     *
-     * @return string The SQL statement string.
-     */
-    public function getQueryString(): string
-    {
-        return $this->before->getQueryString();
+        parent::__construct($before, 'ExecError');
     }
 
     /**
@@ -36,10 +26,5 @@ class ExecError extends PdoEvent
     public function getException(): PDOException
     {
         return $this->exception;
-    }
-
-    public function getBefore(): BeforeExec
-    {
-        return $this->before;
     }
 }

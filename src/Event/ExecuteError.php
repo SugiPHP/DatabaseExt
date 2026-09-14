@@ -11,23 +11,13 @@ use PDOException;
  *
  * Provides access to the failed query, its parameters, and the exception.
  */
-class ExecuteError extends PdoEvent
+class ExecuteError extends FollowUpEvent
 {
     public function __construct(
-        private readonly BeforeExecute $before,
+        BeforeExecute $before,
         private readonly PDOException $exception
     ) {
-        parent::__construct('ExecuteError');
-    }
-
-    /**
-     * Get the SQL query string.
-     *
-     * @return string The SQL query string.
-     */
-    public function getQueryString(): string
-    {
-        return $this->before->getQueryString();
+        parent::__construct($before, 'ExecuteError');
     }
 
     /**
@@ -37,7 +27,7 @@ class ExecuteError extends PdoEvent
      */
     public function getParams(): ?array
     {
-        return $this->before->getParams();
+        return $this->getBefore()->getParams();
     }
 
     /**
@@ -48,10 +38,5 @@ class ExecuteError extends PdoEvent
     public function getException(): PDOException
     {
         return $this->exception;
-    }
-
-    public function getBefore(): BeforeExecute
-    {
-        return $this->before;
     }
 }

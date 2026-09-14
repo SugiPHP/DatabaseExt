@@ -4,20 +4,10 @@ declare(strict_types=1);
 
 namespace Clear\Database\Event;
 
-class BeforeExec extends PdoEvent
+class BeforeExec extends BeforeEvent
 {
-    public function __construct(private readonly string $queryString)
+    public function __construct(string $queryString)
     {
-        parent::__construct('BeforeExec');
-    }
-
-    /**
-     * Get the SQL query string.
-     *
-     * @return string The SQL query string.
-     */
-    public function getQueryString(): string
-    {
-        return $this->queryString;
+        parent::__construct($queryString, 'BeforeExec');
     }
 }

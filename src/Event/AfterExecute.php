@@ -8,23 +8,13 @@ namespace Clear\Database\Event;
  * Event dispatched after a PDO statement is executed.
  * Contains the executed statement, parameters, and execution result.
  */
-class AfterExecute extends PdoEvent
+class AfterExecute extends FollowUpEvent
 {
     public function __construct(
-        private readonly BeforeExecute $before,
+        BeforeExecute $before,
         private readonly bool $result
     ) {
-        parent::__construct('AfterExecute');
-    }
-
-    /**
-     * Get the SQL query string.
-     *
-     * @return string The SQL query string.
-     */
-    public function getQueryString(): string
-    {
-        return $this->before->getQueryString();
+        parent::__construct($before, 'AfterExecute');
     }
 
     /**
@@ -34,16 +24,11 @@ class AfterExecute extends PdoEvent
      */
     public function getParams(): ?array
     {
-        return $this->before->getParams();
+        return $this->getBefore()->getParams();
     }
 
     public function getResult(): bool
     {
         return $this->result;
-    }
-
-    public function getBefore(): BeforeExecute
-    {
-        return $this->before;
     }
 }

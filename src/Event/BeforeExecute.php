@@ -7,27 +7,17 @@ namespace Clear\Database\Event;
 /**
  * Event dispatched before a query is executed.
  */
-class BeforeExecute extends PdoEvent
+class BeforeExecute extends BeforeEvent
 {
     /**
      * @param string     $queryString The SQL query to be executed
      * @param array|null $params      The parameters to be bound to the query
      */
     public function __construct(
-        private readonly string $queryString,
+        string $queryString,
         private readonly ?array $params = null,
     ) {
-        parent::__construct('BeforeExecute');
-    }
-
-    /**
-     * Get the SQL query string.
-     *
-     * @return string The SQL query string.
-     */
-    public function getQueryString(): string
-    {
-        return $this->queryString;
+        parent::__construct($queryString, 'BeforeExecute');
     }
 
     /**
