@@ -132,9 +132,19 @@ class PdoExt extends PDO implements PdoInterface
             throw new InvalidArgumentException('Invalid state provided');
         }
 
-        // Second layer of read-only mode enforcement for PostgreSQL
-        if ($this->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql') {
-            parent::exec('SET default_transaction_read_only = ' . ($state === self::STATE_READ_WRITE ? 'off' : 'on'));
+        // Second layer of read-only mode enforcement at the driver/connection level,
+        // in addition to the app-level canExecute() guard.
+        $readOnly = $state !== self::STATE_READ_WRITE;
+        switch ($this->getAttribute(PDO::ATTR_DRIVER_NAME)) {
+            case 'pgsql':
+                parent::exec('SET default_transaction_read_only = ' . ($readOnly ? 'on' : 'off'));
+                break;
+            case 'mysql':
+                parent::exec('SET SESSION TRANSACTION ' . ($readOnly ? 'READ ONLY' : 'READ WRITE'));
+                break;
+            case 'sqlite':
+                parent::exec('PRAGMA query_only = ' . ($readOnly ? 'ON' : 'OFF'));
+                break;
         }
 
         $this->state = $state;

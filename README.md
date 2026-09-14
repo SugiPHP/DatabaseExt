@@ -66,3 +66,13 @@ $db->setState(PdoExt::STATE_READ_ONLY); // or STATE_READ_WRITE / STATE_UNAVAILAB
 ```
 
 In `STATE_READ_ONLY`, statements starting with `ALTER`, `CREATE`, `DELETE`, `DROP`, `GRANT`, `INSERT`, `RENAME`, `REVOKE`, `TRUNCATE`, or `UPDATE` are rejected (`exec()`/`query()` return `false` without dispatching any event). In `STATE_UNAVAILABLE`, all statements are rejected.
+
+This keyword check is an app-level guard and only covers statements issued through `PdoExt`/`PdoStatementExt`. As a second, driver-enforced layer, `setState()` also puts the underlying connection itself into (or out of) a read-only mode when the driver supports it:
+
+| Driver | Command issued in `STATE_READ_ONLY` / `STATE_UNAVAILABLE` | Command issued in `STATE_READ_WRITE` |
+|---|---|---|
+| `pgsql` | `SET default_transaction_read_only = on` | `SET default_transaction_read_only = off` |
+| `mysql` | `SET SESSION TRANSACTION READ ONLY` | `SET SESSION TRANSACTION READ WRITE` |
+| `sqlite` | `PRAGMA query_only = ON` | `PRAGMA query_only = OFF` |
+
+Other drivers (e.g. `sqlsrv`, `oci`) have no equivalent session-level pragma, so they rely solely on the app-level keyword check above.
