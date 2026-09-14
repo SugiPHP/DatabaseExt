@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Tests\Clear\Database\Event;
+namespace Tests\SugiPHP\DatabaseExt\Event;
 
-use Clear\Database\Event\ExecError;
-use Clear\Database\Event\BeforeExec;
-use Clear\Database\Event\PdoEvent;
+use SugiPHP\DatabaseExt\Event\ExecError;
+use SugiPHP\DatabaseExt\Event\BeforeExec;
+use SugiPHP\DatabaseExt\Event\PdoEvent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;

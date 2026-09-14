@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Clear\Database\Event;
+namespace SugiPHP\DatabaseExt\Event;
 
 /**
  * Event triggered before executing a database query.

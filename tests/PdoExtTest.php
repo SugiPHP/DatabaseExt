@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tests\Clear\Database;
+namespace Tests\SugiPHP\DatabaseExt;
 
-use Clear\Database\PdoExt;
-use Clear\Database\PdoStatementExt;
-use Clear\Database\PDOInterface;
-use Clear\Database\Event\{
+use SugiPHP\DatabaseExt\PdoExt;
+use SugiPHP\DatabaseExt\PdoStatementExt;
+use SugiPHP\DatabaseExt\PDOInterface;
+use SugiPHP\DatabaseExt\Event\{
     AfterConnect,
     AfterExec,
     AfterExecute,

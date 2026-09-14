@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Clear\Database\Event;
+namespace SugiPHP\DatabaseExt\Event;
 
 /**
  * Base class for events dispatched before a statement runs (the Before* events).

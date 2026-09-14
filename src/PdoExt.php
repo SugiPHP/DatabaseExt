@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Clear\Database;
+namespace SugiPHP\DatabaseExt;
 
-use Clear\Database\PdoInterface;
-use Clear\Database\Event\{
+use SugiPHP\DatabaseExt\PdoInterface;
+use SugiPHP\DatabaseExt\Event\{
     AfterConnect,
     AfterExec,
     AfterQuery,
@@ -58,7 +58,7 @@ class PdoExt extends PDO implements PdoInterface
     public function setEventDispatcher(?EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
-        $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, ['\Clear\Database\PdoStatementExt', [$this, $this->dispatcher]]);
+        $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, ['\SugiPHP\DatabaseExt\PdoStatementExt', [$this, $this->dispatcher]]);
     }
 
     /**

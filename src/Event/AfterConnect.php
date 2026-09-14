@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Clear\Database\Event;
+namespace SugiPHP\DatabaseExt\Event;
 
-use Clear\Database\PdoExt;
+use SugiPHP\DatabaseExt\PdoExt;
 
 /**
  * Event dispatched after a PDO class is constructed.

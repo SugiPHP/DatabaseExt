@@ -1,5 +1,5 @@
 {
-    "name": "sugiphp/database",
+    "name": "sugiphp/database-ext",
     "description": "Extends PHP's PDO/PDOStatement with PSR-14 event dispatching and a read/write connection state guard.",
     "type": "library",
     "license": "MIT",
@@ -12,12 +12,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Clear\\Database\\": "src/"
+            "SugiPHP\\DatabaseExt\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\Clear\\Database\\": "tests/"
+            "Tests\\SugiPHP\\DatabaseExt\\": "tests/"
         }
     },
     "scripts": {

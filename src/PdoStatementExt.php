@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Clear\Database;
+namespace SugiPHP\DatabaseExt;
 
-use Clear\Database\Event\AfterExecute;
-use Clear\Database\Event\BeforeExecute;
-use Clear\Database\Event\ExecuteError;
+use SugiPHP\DatabaseExt\Event\AfterExecute;
+use SugiPHP\DatabaseExt\Event\BeforeExecute;
+use SugiPHP\DatabaseExt\Event\ExecuteError;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use PDOStatement;
 use PDOException;

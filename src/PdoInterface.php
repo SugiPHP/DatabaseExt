@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Clear\Database;
+namespace SugiPHP\DatabaseExt;
 
 use PDO;
 use PDOStatement;

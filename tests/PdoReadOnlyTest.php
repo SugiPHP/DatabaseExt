@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Tests\Clear\Database;
+namespace Tests\SugiPHP\DatabaseExt;
 
-use Clear\Database\PdoExt;
-use Clear\Database\PdoInterface;
-use Clear\Database\Event\{
+use SugiPHP\DatabaseExt\PdoExt;
+use SugiPHP\DatabaseExt\PdoInterface;
+use SugiPHP\DatabaseExt\Event\{
     AfterConnect,
     AfterExec,
     AfterExecute,
@@ -15,7 +15,7 @@ use Clear\Database\Event\{
     BeforeExecute,
     BeforeQuery
 };
-use Clear\Database\PdoStatementExt;
+use SugiPHP\DatabaseExt\PdoStatementExt;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

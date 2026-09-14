@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Tests\Clear\Database\Event;
+namespace Tests\SugiPHP\DatabaseExt\Event;
 
-use Clear\Database\Event\AfterConnect;
-use Clear\Database\Event\PdoEvent;
-use Clear\Database\PdoExt;
+use SugiPHP\DatabaseExt\Event\AfterConnect;
+use SugiPHP\DatabaseExt\Event\PdoEvent;
+use SugiPHP\DatabaseExt\PdoExt;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use PDO;
 
 #[CoversClass(AfterConnect::class)]
-#[CoversClass(\Clear\Database\PdoExt::class)]
+#[CoversClass(\SugiPHP\DatabaseExt\PdoExt::class)]
 class AfterConnectTest extends TestCase
 {
     private PdoExt $pdo;

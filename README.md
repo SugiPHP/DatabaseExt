@@ -1,4 +1,4 @@
-# Clear\Database
+# SugiPHP\DatabaseExt
 
 **Version 1.3**
 
@@ -17,7 +17,7 @@ Extends PHP's `PDO`/`PDOStatement` with PSR-14 event dispatching and a read/writ
 ## Usage
 
 ```php
-use Clear\Database\PdoExt;
+use SugiPHP\DatabaseExt\PdoExt;
 
 $db = new PdoExt('sqlite:/path/to/database.sqlite');
 
@@ -33,7 +33,7 @@ By default `PDO::ATTR_ERRMODE` is set to `PDO::ERRMODE_EXCEPTION` (unless overri
 Pass a PSR-14 `EventDispatcherInterface` to observe queries (e.g. for logging or profiling):
 
 ```php
-use Clear\Database\PdoExt;
+use SugiPHP\DatabaseExt\PdoExt;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 $db = new PdoExt('sqlite:/path/to/database.sqlite');
@@ -59,7 +59,7 @@ Each `After*`/`*Error` event carries a `getBefore()` accessor returning the matc
 `PdoExt::setState()` restricts which statements may run:
 
 ```php
-use Clear\Database\PdoExt;
+use SugiPHP\DatabaseExt\PdoExt;
 
 $db = new PdoExt('sqlite:/path/to/database.sqlite');
 $db->setState(PdoExt::STATE_READ_ONLY); // or STATE_READ_WRITE / STATE_UNAVAILABLE
