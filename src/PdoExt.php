@@ -45,6 +45,9 @@ class PdoExt extends PDO implements PdoInterface
             unset($options['dispatcher']);
         }
         parent::__construct($dsn, $username, $passwd, $options);
+        if (!array_key_exists(PDO::ATTR_ERRMODE, $options)) {
+            $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        }
         $this->setEventDispatcher($dispatcher);
         $this->dispatch(new AfterConnect($dsn, $username, $options, $this));
     }
@@ -131,7 +134,7 @@ class PdoExt extends PDO implements PdoInterface
 
         // Second layer of read-only mode enforcement for PostgreSQL
         if ($this->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql') {
-            $this->exec('SET default_transaction_read_only = ' . ($state === self::STATE_READ_WRITE ? 'off' : 'on'));
+            parent::exec('SET default_transaction_read_only = ' . ($state === self::STATE_READ_WRITE ? 'off' : 'on'));
         }
 
         $this->state = $state;

@@ -26,6 +26,8 @@ $sth = $db->prepare('SELECT * FROM users WHERE id = ?');
 $sth->execute([1]);
 ```
 
+By default `PDO::ATTR_ERRMODE` is set to `PDO::ERRMODE_EXCEPTION` (unless overridden via the `$options` array), so failed statements throw a `PDOException` and the `ExecError`/`QueryError`/`ExecuteError` events fire as documented below.
+
 ### Events
 
 Pass a PSR-14 `EventDispatcherInterface` to observe queries (e.g. for logging or profiling):
